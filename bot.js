@@ -905,20 +905,28 @@ function normalizeFancyUnicode(text) {
     else if (code >= 0x1D7C4 && code <= 0x1D7C9) normalized = String.fromCharCode(code - 0x1D7C4 + 0x61);
     else {
       const lookalikes = {
-        'Ꝋ':'o','ꝋ':'o','Ᏽ':'g','ℊ':'g','ℎ':'h','ℏ':'h','ℓ':'l','ℯ':'e','ℴ':'o',
-        'ℹ':'i','ℼ':'p','ℽ':'p','ℾ':'p','ℿ':'p','ⅅ':'d','ⅆ':'d','ⅇ':'e','ⅈ':'i','ⅉ':'j',
-        'Ⰰ':'a','Ⰱ':'b','Ⰲ':'v','Ⰳ':'g','Ⰴ':'d','Ⰵ':'e','Ⰶ':'z','Ⰸ':'i','Ⰹ':'i','Ⰺ':'j',
-        'Ⰻ':'k','Ⰼ':'l','Ⰽ':'m','Ⰾ':'n','Ⰿ':'o','Ⱀ':'p','Ⱁ':'r','Ⱂ':'s','Ⱃ':'t','Ⱄ':'u',
-        '𐌀':'a','𐌁':'b','𐌂':'c','𐌃':'d','𐌄':'e','𐌅':'f','𐌆':'z','𐌇':'h','𐌈':'i','𐌉':'i',
-        '𐌊':'k','𐌋':'l','𐌌':'m','𐌍':'n','𐌏':'o','𐌐':'p','𐌑':'q','𐌒':'r','𐌓':'s','𐌔':'t',
-        '𐌕':'t','𐌖':'v','𐌗':'x','𐌵':'u','Ａ':'a','Ｂ':'b','Ｃ':'c','Ｄ':'d','Ｅ':'e','Ｆ':'f',
-        'Ｇ':'g','Ｈ':'h','Ｉ':'i','Ｊ':'j','Ｋ':'k','Ｌ':'l','Ｍ':'m','Ｎ':'n','Ｏ':'o','Ｐ':'p',
-        'Ｑ':'q','Ｒ':'r','Ｓ':'s','Ｔ':'t','Ｕ':'u','Ｖ':'v','Ｗ':'w','Ｘ':'x','Ｙ':'y','Ｚ':'z',
-        'ａ':'a','ｂ':'b','ｃ':'c','ｄ':'d','ｅ':'e','ｆ':'f','ｇ':'g','ｈ':'h','ｉ':'i','ｊ':'j',
-        'ｋ':'k','ｌ':'l','ｍ':'m','ｎ':'n','ｏ':'o','ｐ':'p','ｑ':'q','ｒ':'r','ｓ':'s','ｔ':'t',
-        'ｕ':'u','ｖ':'v','ｗ':'w','ｘ':'x','ｙ':'y','ｚ':'z'
+        'Α':'a','Β':'b','Ε':'e','Ζ':'z','Η':'h','Ι':'i','Κ':'k','Μ':'m','Ν':'n','Ο':'o','Ρ':'p','Τ':'t','Υ':'y','Χ':'x','Γ':'g','Δ':'d','Θ':'t','Λ':'l','Ξ':'x','Π':'p','Σ':'s','Φ':'f','Ψ':'p','Ω':'w',
+        'α':'a','β':'b','γ':'g','δ':'d','ε':'e','ζ':'z','η':'h','θ':'t','ι':'i','κ':'k','λ':'l','μ':'m','ν':'n','ξ':'x','ο':'o','π':'p','ρ':'r','σ':'s','ς':'s','τ':'t','υ':'y','φ':'f','χ':'x','ψ':'p','ω':'w',
+        'А':'a','В':'b','Е':'e','К':'k','М':'m','Н':'h','О':'o','Р':'p','С':'c','Т':'t','У':'y','Х':'x','Ѕ':'s','І':'i','Ј':'j','Ґ':'g','Ғ':'f','Ҝ':'k','Ӏ':'i','Ӧ':'o','Ӱ':'y',
+        'а':'a','в':'b','е':'e','к':'k','м':'m','н':'h','о':'o','р':'p','с':'c','т':'t','у':'y','х':'x','ѕ':'s','і':'i','ј':'j','ԁ':'d','ԍ':'g','ԛ':'q','ԝ':'w','ҝ':'k','ӏ':'i','ӧ':'o','ӱ':'y',
+        'Ꝋ':'o','ꝋ':'o','Ᏽ':'g','ℊ':'g','ℎ':'h','ℏ':'h','ℓ':'l','ℯ':'e','ℴ':'o','ℹ':'i','ℼ':'p','ℽ':'p','ℾ':'p','ℿ':'p','ⅅ':'d','ⅆ':'d','ⅇ':'e','ⅈ':'i','ⅉ':'j','ℂ':'c','ℍ':'h','ℕ':'n','ℙ':'p','ℚ':'q','ℝ':'r','ℤ':'z',
+        'Ⰰ':'a','Ⰱ':'b','Ⰲ':'v','Ⰳ':'g','Ⰴ':'d','Ⰵ':'e','Ⰶ':'z','Ⰸ':'i','Ⰹ':'i','Ⰺ':'j','Ⰻ':'k','Ⰼ':'l','Ⰽ':'m','Ⰾ':'n','Ⰿ':'o','Ⱀ':'p','Ⱁ':'r','Ⱂ':'s','Ⱃ':'t','Ⱄ':'u',
+        '𐌀':'a','𐌁':'b','𐌂':'c','𐌃':'d','𐌄':'e','𐌅':'f','𐌆':'z','𐌇':'h','𐌈':'i','𐌉':'i','𐌊':'k','𐌋':'l','𐌌':'m','𐌍':'n','𐌏':'o','𐌐':'p','𐌑':'q','𐌒':'r','𐌓':'s','𐌔':'t','𐌕':'t','𐌖':'v','𐌗':'x','𐌵':'u',
+        'Ａ':'a','Ｂ':'b','Ｃ':'c','Ｄ':'d','Ｅ':'e','Ｆ':'f','Ｇ':'g','Ｈ':'h','Ｉ':'i','Ｊ':'j','Ｋ':'k','Ｌ':'l','Ｍ':'m','Ｎ':'n','Ｏ':'o','Ｐ':'p','Ｑ':'q','Ｒ':'r','Ｓ':'s','Ｔ':'t','Ｕ':'u','Ｖ':'v','Ｗ':'w','Ｘ':'x','Ｙ':'y','Ｚ':'z',
+        'ａ':'a','ｂ':'b','ｃ':'c','ｄ':'d','ｅ':'e','ｆ':'f','ｇ':'g','ｈ':'h','ｉ':'i','ｊ':'j','ｋ':'k','ｌ':'l','ｍ':'m','ｎ':'n','ｏ':'o','ｐ':'p','ｑ':'q','ｒ':'r','ｓ':'s','ｔ':'t','ｕ':'u','ｖ':'v','ｗ':'w','ｘ':'x','ｙ':'y','ｚ':'z',
+        '⒜':'a','⒝':'b','⒞':'c','⒟':'d','⒠':'e','⒡':'f','⒢':'g','⒣':'h','⒤':'i','⒥':'j','⒦':'k','⒧':'l','⒨':'m','⒩':'n','⒪':'o','⒫':'p','⒬':'q','⒭':'r','⒮':'s','⒯':'t','⒰':'u','⒱':'v','⒲':'w','⒳':'x','⒴':'y','⒵':'z',
+        'Ⓐ':'a','Ⓑ':'b','Ⓒ':'c','Ⓓ':'d','Ⓔ':'e','Ⓕ':'f','Ⓖ':'g','Ⓗ':'h','Ⓘ':'i','Ⓙ':'j','Ⓚ':'k','Ⓛ':'l','Ⓜ':'m','Ⓝ':'n','Ⓞ':'o','Ⓟ':'p','Ⓠ':'q','Ⓡ':'r','Ⓢ':'s','Ⓣ':'t','Ⓤ':'u','Ⓥ':'v','Ⓦ':'w','Ⓧ':'x','Ⓨ':'y','Ⓩ':'z',
+        'ⓐ':'a','ⓑ':'b','ⓒ':'c','ⓓ':'d','ⓔ':'e','ⓕ':'f','ⓖ':'g','ⓗ':'h','ⓘ':'i','ⓙ':'j','ⓚ':'k','ⓛ':'l','ⓜ':'m','ⓝ':'n','ⓞ':'o','ⓟ':'p','ⓠ':'q','ⓡ':'r','ⓢ':'s','ⓣ':'t','ⓤ':'u','ⓥ':'v','ⓦ':'w','ⓧ':'x','ⓨ':'y','ⓩ':'z',
+        '🅐':'a','🅑':'b','🅒':'c','🅓':'d','🅔':'e','🅕':'f','🅖':'g','🅗':'h','🅘':'i','🅙':'j','🅚':'k','🅛':'l','🅜':'m','🅝':'n','🅞':'o','🅟':'p','🅠':'q','🅡':'r','🅢':'s','🅣':'t','🅤':'u','🅥':'v','🅦':'w','🅧':'x','🅨':'y','🅩':'z',
+        '🅰':'a','🅱':'b','🅲':'c','🅳':'d','🅴':'e','🅵':'f','🅶':'g','🅷':'h','🅸':'i','🅹':'j','🅺':'k','🅻':'l','🅼':'m','🅽':'n','🅾':'o','🅿':'p','🆀':'q','🆁':'r','🆂':'s','🆃':'t','🆄':'u','🆅':'v','🆆':'w','🆇':'x','🆈':'y','🆉':'z',
+        '𝐀':'a','𝐁':'b','𝐂':'c','𝐃':'d','𝐄':'e','𝐅':'f','𝐆':'g','𝐇':'h','𝐈':'i','𝐉':'j','𝐊':'k','𝐋':'l','𝐌':'m','𝐍':'n','𝐎':'o','𝐏':'p','𝐐':'q','𝐑':'r','𝐒':'s','𝐓':'t','𝐔':'u','𝐕':'v','𝐖':'w','𝐗':'x','𝐘':'y','𝐙':'z',
+        '𝐚':'a','𝐛':'b','𝐜':'c','𝐝':'d','𝐞':'e','𝐟':'f','𝐠':'g','𝐡':'h','𝐢':'i','𝐣':'j','𝐤':'k','𝐥':'l','𝐦':'m','𝐧':'n','𝐨':'o','𝐩':'p','𝐪':'q','𝐫':'r','𝐬':'s','𝐭':'t','𝐮':'u','𝐯':'v','𝐰':'w','𝐱':'x','𝐲':'y','𝐳':'z',
+        'ᵃ':'a','ᵇ':'b','ᶜ':'c','ᵈ':'d','ᵉ':'e','ᶠ':'f','ᵍ':'g','ʰ':'h','ⁱ':'i','ʲ':'j','ᵏ':'k','ˡ':'l','ᵐ':'m','ⁿ':'n','ᵒ':'o','ᵖ':'p','ʳ':'r','ˢ':'s','ᵗ':'t','ᵘ':'u','ᵛ':'v','ʷ':'w','ˣ':'x','ʸ':'y','ᶻ':'z',
+        'ₐ':'a','ₑ':'e','ₕ':'h','ᵢ':'i','ⱼ':'j','ₖ':'k','ₗ':'l','ₘ':'m','ₙ':'n','ₒ':'o','ₚ':'p','ᵣ':'r','ₛ':'s','ₜ':'t','ᵤ':'u','ᵥ':'v','ₓ':'x',
+        '🇦':'a','🇧':'b','🇨':'c','🇩':'d','🇪':'e','🇫':'f','🇬':'g','🇭':'h','🇮':'i','🇯':'j','🇰':'k','🇱':'l','🇲':'m','🇳':'n','🇴':'o','🇵':'p','🇶':'q','🇷':'r','🇸':'s','🇹':'t','🇺':'u','🇻':'v','🇼':'w','🇽':'x','🇾':'y','🇿':'z',
+        '♠':'s','♣':'c','♥':'h','♦':'d','★':'s','☆':'s','▪':'i','●':'o','○':'o','◉':'o','◐':'o','◑':'o','◒':'o','◓':'o','◔':'o','◕':'o','◖':'o','◗':'o',
+        '〇':'o','㊀':'zero','㊁':'one','㊂':'two','㊃':'three','㊄':'four','㊅':'five','㊆':'six','㊇':'seven','㊈':'eight','㊉':'nine'
       };
-      
       const char = String.fromCodePoint(code);
       normalized = lookalikes[char] || char;
     }
@@ -932,7 +940,13 @@ function normalizeFancyUnicode(text) {
 function normalizeForDetection(text) {
   let normalized = normalizeFancyUnicode(text).toLowerCase();
   
-  for (let pass = 0; pass < 3; pass++) {
+  normalized = normalized
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\u2060-\u206F]/g, '')
+    .replace(/[\uFE00-\uFE0F]/g, '')
+    .replace(/[\u202A-\u202E]/g, '');
+  
+  for (let pass = 0; pass < 7; pass++) {
     normalized = normalized
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -951,7 +965,7 @@ function normalizeForDetection(text) {
         };
         return map[char] || char;
       })
-      .replace(/[øØ∅]/g, 'o')
+      .replace(/[øØ∅⊘⊗⌀]/g, 'o')
       .replace(/[àáâãäåæāăąǎǻ]/g, 'a')
       .replace(/[èéêëēĕėęě]/g, 'e')
       .replace(/[ìíîïĩīĭįı]/g, 'i')
@@ -969,13 +983,55 @@ function normalizeForDetection(text) {
       .replace(/[œ]/g, 'o')
       .replace(/[@]/g, 'a')
       .replace(/[&]/g, 'a')
-      .replace(/[$]/g, 's')
+      .replace(/[₳Ⱥ]/g, 'a')
+      .replace(/[₿฿]/g, 'b')
+      .replace(/[¢₡₵₢]/g, 'c')
+      .replace(/[₫ⅅ]/g, 'd')
+      .replace(/[€₤£₠]/g, 'e')
+      .replace(/[₣]/g, 'f')
+      .replace(/[₲]/g, 'g')
+      .replace(/[₴]/g, 'h')
+      .replace(/[₱₧]/g, 'p')
+      .replace(/[₹₨]/g, 'r')
+      .replace(/[$₴₷]/g, 's')
+      .replace(/[₮₸]/g, 't')
+      .replace(/[₦]/g, 'n')
+      .replace(/[₩]/g, 'w')
+      .replace(/[¥₺]/g, 'y')
+      .replace(/[₵]/g, 'z')
       .replace(/[!¡|]/g, 'i')
-      .replace(/[×]/g, 'x')
+      .replace(/[\/\\]/g, '')
+      .replace(/[×∗∘⊗⊕]/g, 'x')
       .replace(/[#]/g, 'h')
-      .replace(/[%]/g, 'o')
+      .replace(/[%‰]/g, 'o')
       .replace(/[+]/g, 't')
-      .replace(/[~]/g, 'n')
+      .replace(/[~≈]/g, 'n')
+      .replace(/[*]/g, '')
+      .replace(/[°ᵒ]/g, 'o')
+      .replace(/[¹]/g, 'i')
+      .replace(/[²]/g, 'z')
+      .replace(/[³]/g, 'e')
+      .replace(/[⁴]/g, 'a')
+      .replace(/[⁵]/g, 's')
+      .replace(/[⁶]/g, 'g')
+      .replace(/[⁷]/g, 't')
+      .replace(/[⁸]/g, 'b')
+      .replace(/[⁹]/g, 'g')
+      .replace(/[⁰]/g, 'o')
+      .replace(/[₀]/g, 'o')
+      .replace(/[₁]/g, 'i')
+      .replace(/[₂]/g, 'z')
+      .replace(/[₃]/g, 'e')
+      .replace(/[₄]/g, 'a')
+      .replace(/[₅]/g, 's')
+      .replace(/[₆]/g, 'g')
+      .replace(/[₇]/g, 't')
+      .replace(/[₈]/g, 'b')
+      .replace(/[₉]/g, 'g')
+      .replace(/[.,:;'"<>?{}[\]()]/g, '')
+      .replace(/ph/g, 'f')
+      .replace(/ck/g, 'k')
+      .replace(/qu/g, 'kw')
       .replace(/0/g, 'o')
       .replace(/1/g, 'i')
       .replace(/2/g, 'z')
@@ -988,14 +1044,57 @@ function normalizeForDetection(text) {
       .replace(/9/g, 'g')
       .replace(/[-_]/g, '')
       .replace(/[^a-z\s]/g, '')
+      .replace(/(.)\1\1\1+/g, '$1$1')
+      .replace(/(.)\1\1+/g, '$1')
       .replace(/(.)\1+/g, '$1')
       .replace(/\s+/g, ' ')
       .trim();
   }
   
+  normalized = applyKeyboardProximity(normalized);
   normalized = expandAbbreviations(normalized);
+  normalized = applyPhoneticReplacements(normalized);
   
   return normalized;
+}
+
+function applyKeyboardProximity(text) {
+  const proximityMap = {
+    'w':'vv','vv':'w','rn':'m','m':'rn','cl':'d','d':'cl',
+    'ii':'u','nn':'m','uu':'w'
+  };
+  let result = text;
+  for (const [pattern, replacement] of Object.entries(proximityMap)) {
+    result = result.replace(new RegExp(pattern, 'g'), replacement);
+  }
+  return result;
+}
+
+function applyPhoneticReplacements(text) {
+  return text
+    .replace(/ph/g, 'f')
+    .replace(/ck/g, 'k')
+    .replace(/ks/g, 'x')
+    .replace(/qu/g, 'kw')
+    .replace(/kn/g, 'n')
+    .replace(/wr/g, 'r')
+    .replace(/gh/g, 'g')
+    .replace(/ps/g, 's')
+    .replace(/pn/g, 'n')
+    .replace(/pt/g, 't')
+    .replace(/tch/g, 'ch')
+    .replace(/dge/g, 'j')
+    .replace(/xc/g, 'ks')
+    .replace(/sc/g, 's')
+    .replace(/sh/g, 's')
+    .replace(/th/g, 't')
+    .replace(/wh/g, 'w')
+    .replace(/v/g, 'f')
+    .replace(/w/g, 'v')
+    .replace(/x/g, 'ks')
+    .replace(/z/g, 's')
+    .replace(/c/g, 'k')
+    .replace(/q/g, 'k');
 }
 
 function expandAbbreviations(text) {
@@ -1020,7 +1119,7 @@ function createFlexiblePattern(normalizedKeyword) {
   const chars = normalizedKeyword.split('');
   const pattern = chars.map(char => {
     if (char === ' ') {
-      return '[^a-z]+';
+      return '\\s+';
     } else if (/[a-z]/.test(char)) {
       return char + '[^a-z]*';
     } else {
@@ -1028,7 +1127,7 @@ function createFlexiblePattern(normalizedKeyword) {
     }
   }).join('');
   
-  const finalPattern = `(?<![a-z])${pattern.replace(/\[\^a-z\]\*$/, '')}(?![a-z])`;
+  const finalPattern = `\\b${pattern.replace(/\[\^a-z\]\*$/, '')}\\b`;
   return new RegExp(finalPattern, 'i');
 }
 
@@ -1067,6 +1166,7 @@ async function issueWarning(threadID, messageID, senderID, event, reason, isPerm
         api.removeUserFromGroup(senderID, threadID, (err) => {
           if (err) {
             console.error("Failed to remove user from group:", err);
+            sendMessage(threadID, `❌ Failed to kick ${nickname}. Please try again or remove manually.`, messageID);
           } else {
             console.log(`✅ Kicked ${nickname} for 3 warnings`);
           }
@@ -1411,7 +1511,7 @@ async function handleBanCommand(threadID, messageID, senderID, event) {
     durationMessage += `\nBan will be lifted on: ${liftDateObj.toLocaleString('en-US', { timeZone: 'Asia/Manila' })}`;
   }
 
-  sendMessage(threadID, `⚠️ ${nickname} will be banned!\n\n${durationMessage}\n\n${nickname} is about to get kicked...`, messageID);
+  sendMessage(threadID, `🔨 ${nickname} has been banned!\n\nReason: ${reason}\nBanned by: ${bannerName}\nBan ID: ${uid}\n${durationMessage}\n\nTo unban: .unban ${uid}`, messageID);
 
   setTimeout(() => {
     sendMessage(threadID, `Uy may lumipad HAHAHA\n\nGoodboy ka next time ha HAHA 😂😂`);
@@ -1420,14 +1520,13 @@ async function handleBanCommand(threadID, messageID, senderID, event) {
       api.removeUserFromGroup(targetUserID, threadID, (err) => {
         if (err) {
           console.error("Failed to remove user from group:", err);
-          sendMessage(threadID, `⚠️ ${nickname} has been banned but could not be removed from the group automatically.\n\nBan ID: ${uid}`, messageID);
+          sendMessage(threadID, `❌ Failed to remove ${nickname} from the group. Please try removing manually.`, messageID);
         } else {
           console.log(`✅ Removed ${nickname} from group ${threadID}`);
-          sendMessage(threadID, `🔨 ${nickname} has been banned and removed from the group.\n\nReason: ${reason}\nBanned by: ${bannerName}\nBan ID: ${uid}\n${durationMessage}\n\nTo unban: .unban ${uid}`, messageID);
         }
       });
     }, 1000);
-  }, 2000);
+  }, 1500);
 }
 
 async function handleBannedCommand(threadID, messageID) {
@@ -1647,7 +1746,7 @@ async function handleKickCommand(threadID, messageID, senderID, event) {
 
   console.log(`👢 ${kickerName} is kicking ${nickname} from group ${threadID}`);
 
-  sendMessage(threadID, `👢 ${nickname} will be kicked from the group.\n\nReason: ${reason}\nKicked by: ${kickerName}`, messageID);
+  sendMessage(threadID, `👢 ${nickname} has been kicked from the group.\n\nReason: ${reason}\nKicked by: ${kickerName}`, messageID);
   
   setTimeout(() => {
     sendMessage(threadID, `Uy may lumipad HAHAHA\n\nGoodboy ka next time ha HAHA 😂😂`);
@@ -2111,15 +2210,18 @@ async function handleGroupEvent(event) {
         
         console.log(`⚠️ Banned user ${nickname} (${userID}) attempted to join group ${threadID}`);
         
-        api.removeUserFromGroup(userID, threadID, (err) => {
-          if (err) {
-            console.error(`Failed to auto-kick banned user ${nickname}:`, err);
-            sendMessage(threadID, `⚠️ Banned user ${nickname} tried to join but auto-kick failed. Please remove manually.`);
-          } else {
-            console.log(`✅ Auto-kicked banned user ${nickname} from group ${threadID}`);
-            sendMessage(threadID, `🚫 ${nickname} is banned and was automatically removed.\n\nUse .banned to see the ban list or .unban to remove the ban.`);
-          }
-        });
+        sendMessage(threadID, `🚫 ${nickname} is banned and will be automatically removed.\n\nUse .banned to see the ban list or .unban to remove the ban.`);
+        
+        setTimeout(() => {
+          api.removeUserFromGroup(userID, threadID, (err) => {
+            if (err) {
+              console.error(`Failed to auto-kick banned user ${nickname}:`, err);
+              sendMessage(threadID, `❌ Auto-kick failed for ${nickname}. Please remove manually.`);
+            } else {
+              console.log(`✅ Auto-kicked banned user ${nickname} from group ${threadID}`);
+            }
+          });
+        }, 1500);
         continue;
       }
 
@@ -2404,18 +2506,21 @@ async function performDailyReset() {
       );
       
       if (uid) {
-        api.removeUserFromGroup(user.userID, user.threadID, (err) => {
-          if (err) {
-            console.error(`❌ Failed to remove ${user.nickname} from group:`, err);
-            console.log("⚠️ User marked as banned but removal failed - may need manual intervention");
-          } else {
-            console.log(`✅ Auto-kicked ${user.nickname} from group ${user.threadID}`);
-            sendMessage(
-              user.threadID, 
-              `🚫 ${user.nickname} has been automatically removed for ${user.reason}.\n\nBan ID: ${uid}\nTo unban: .unban ${uid}`
-            );
-          }
-        });
+        sendMessage(
+          user.threadID, 
+          `🚫 ${user.nickname} has been automatically removed for ${user.reason}.\n\nBan ID: ${uid}\nTo unban: .unban ${uid}`
+        );
+        
+        setTimeout(() => {
+          api.removeUserFromGroup(user.userID, user.threadID, (err) => {
+            if (err) {
+              console.error(`❌ Failed to remove ${user.nickname} from group:`, err);
+              console.log("⚠️ User marked as banned but removal failed - may need manual intervention");
+            } else {
+              console.log(`✅ Auto-kicked ${user.nickname} from group ${user.threadID}`);
+            }
+          });
+        }, 1500);
       }
     }
   }
