@@ -821,6 +821,36 @@ async function checkForVulgarWords(threadID, messageID, senderID, message, event
   }
 }
 
+const COMMON_SAFE_WORDS = new Set([
+  'a', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'hi', 'i', 'if', 'in', 'is', 'it', 'me', 'my', 'no', 'of', 'ok', 'on', 'or', 'so', 'to', 'up', 'us', 'we',
+  'all', 'and', 'are', 'but', 'can', 'did', 'for', 'get', 'had', 'has', 'her', 'him', 'his', 'how', 'its', 'may', 'new', 'not', 'now', 'off', 'old', 'one', 'our', 'out', 'own', 'put', 'run', 'say', 'see', 'set', 'she', 'the', 'too', 'two', 'use', 'was', 'way', 'who', 'why', 'will', 'with', 'you', 'your'
+]);
+
+const MIN_KEYWORD_LENGTH = 3;
+
+function validateKeyword(keyword) {
+  const normalized = normalizeForDetection(keyword);
+  
+  if (normalized.length < MIN_KEYWORD_LENGTH) {
+    return {
+      valid: false,
+      reason: `too short (minimum ${MIN_KEYWORD_LENGTH} characters after normalization)`
+    };
+  }
+  
+  const words = normalized.split(/\s+/);
+  const isSingleCommonWord = words.length === 1 && COMMON_SAFE_WORDS.has(words[0]);
+  
+  if (isSingleCommonWord) {
+    return {
+      valid: false,
+      reason: 'common English word that would cause false positives'
+    };
+  }
+  
+  return { valid: true };
+}
+
 function normalizeFancyUnicode(text) {
   let result = '';
   for (let i = 0; i < text.length; i++) {
@@ -1068,19 +1098,41 @@ async function handleAddWarningKeywordCommand(threadID, messageID, senderID, mes
     return;
   }
 
-  const result = data.addWarningKeywords(threadID, keywords);
+  const validKeywords = [];
+  const invalidKeywords = [];
   
+  for (const keyword of keywords) {
+    const validation = validateKeyword(keyword);
+    if (validation.valid) {
+      validKeywords.push(keyword);
+    } else {
+      invalidKeywords.push({ word: keyword, reason: validation.reason });
+    }
+  }
+
   let responseMessage = "";
   
-  if (result.added.length > 0) {
-    responseMessage += `✅ Warning keywords added: ${result.added.join(', ')}\n\n`;
+  if (validKeywords.length > 0) {
+    const result = data.addWarningKeywords(threadID, validKeywords);
+    
+    if (result.added.length > 0) {
+      responseMessage += `✅ Warning keywords added: ${result.added.join(', ')}\n\n`;
+    }
+    
+    if (result.skipped.length > 0) {
+      responseMessage += `⚠️ Already in list: ${result.skipped.join(', ')}\n\n`;
+    }
   }
   
-  if (result.skipped.length > 0) {
-    responseMessage += `⚠️ Already in list: ${result.skipped.join(', ')}\n\n`;
+  if (invalidKeywords.length > 0) {
+    responseMessage += `❌ Rejected keywords:\n`;
+    for (const item of invalidKeywords) {
+      responseMessage += `  • "${item.word}" - ${item.reason}\n`;
+    }
+    responseMessage += "\n";
   }
   
-  if (result.added.length > 0) {
+  if (validKeywords.length > 0 && invalidKeywords.length === 0) {
     responseMessage += "These words will now trigger automatic warnings.";
   }
   
@@ -1987,11 +2039,20 @@ async function handleGroupEvent(event) {
   if (event.logMessageType === "log:subscribe") {
     const threadID = event.threadID;
     const addedUserIDs = event.logMessageData.addedParticipants.map(p => p.userFbId);
+    const adderID = event.author;
 
     const threadInfo = await getThreadInfo(threadID);
     if (!threadInfo) return;
 
     await updateGroupMembers(threadID, threadInfo);
+    
+    const isAdderTrusted = isDeveloper(adderID) || isSuperAdmin(adderID) || isAdmin(threadID, adderID);
+    
+    if (isAdderTrusted) {
+      console.log(`✅ Trusted user (${adderID}) added ${addedUserIDs.length} member(s) to the group`);
+    } else {
+      console.log(`⚠️ Regular user (${adderID}) added ${addedUserIDs.length} member(s) - admins may need to approve`);
+    }
 
     for (const userID of addedUserIDs) {
       if (userID === botUserId) {
