@@ -1,0 +1,52 @@
+{
+  "3731330440508007": [
+    {
+      "uid": "7GWPBB",
+      "userID": "100083845534621",
+      "nickname": "Jon Randall Zafra II",
+      "reason": "Accumulated 3 warnings",
+      "bannedBy": "System",
+      "date": "2025-11-07T11:33:02.605Z",
+      "banCount": 1,
+      "durationType": "3 days",
+      "liftDate": "2025-11-10T11:33:02.605Z"
+    },
+    {
+      "uid": "1BHPEC",
+      "userID": "100089982527985",
+      "nickname": "Karlos Barroga",
+      "reason": "Accumulated 3 warnings",
+      "bannedBy": "System",
+      "date": "2025-11-07T16:40:12.588Z",
+      "banCount": 1,
+      "durationType": "3 days",
+      "liftDate": "2025-11-10T16:40:12.588Z"
+    }
+  ],
+  "1913374189226652": [
+    {
+      "uid": "UMP4OW",
+      "userID": "100037899113524",
+      "nickname": "Pansamantalang saya :(",
+      "reason": "Accumulated 3 warnings",
+      "bannedBy": "System",
+      "date": "2025-11-07T11:33:06.775Z",
+      "banCount": 1,
+      "durationType": "3 days",
+      "liftDate": "2025-11-10T11:33:06.775Z"
+    }
+  ],
+  "683758387794862": [
+    {
+      "uid": "7LN3ID",
+      "userID": "100027103402865",
+      "nickname": "ObxAspect",
+      "reason": "Accumulated 3 warnings",
+      "bannedBy": "System",
+      "date": "2025-11-07T11:33:08.184Z",
+      "banCount": 1,
+      "durationType": "3 days",
+      "liftDate": "2025-11-10T11:33:08.184Z"
+    }
+  ]
+}
