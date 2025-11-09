@@ -668,7 +668,7 @@ async function handleSetGreetingCommand(threadID, messageID, senderID, message) 
 }
 
 async function checkMessageSpam(threadID, messageID, senderID, message) {
-  if (isProtectedUser(senderID) || isAdmin(threadID, senderID)) {
+  if (isProtectedUser(senderID)) {
     return;
   }
 
@@ -676,7 +676,7 @@ async function checkMessageSpam(threadID, messageID, senderID, message) {
   const now = Date.now();
   
   if (!spamDetection.has(key)) {
-    spamDetection.set(key, { messages: [], lastReset: now });
+    spamDetection.set(key, { messages: [], lastReset: now, warned: false });
   }
 
   const userSpam = spamDetection.get(key);
@@ -684,24 +684,33 @@ async function checkMessageSpam(threadID, messageID, senderID, message) {
   if (now - userSpam.lastReset > 10000) {
     userSpam.messages = [];
     userSpam.lastReset = now;
+    userSpam.warned = false;
   }
 
   userSpam.messages.push(message);
 
-  if (userSpam.messages.length >= 5) {
+  if (userSpam.messages.length >= 3) {
     const allSame = userSpam.messages.every(msg => msg === userSpam.messages[0]);
     
     if (allSame) {
-      const threadInfo = await getThreadInfo(threadID);
-      const userInfo = await getUserInfo(senderID);
-      const nickname = threadInfo?.nicknames?.[senderID] || userInfo?.name || "User";
-
-      console.log(`⚠️ Warning ${nickname} for spamming the same message`);
+      if (userSpam.messages.length === 3 && !userSpam.warned) {
+        sendMessage(threadID, "⚠️ Warning: You're spamming the same message. If you continue, you will receive a permanent warning!\n\nUse .help to see available commands and avoid consequences.", messageID);
+        userSpam.warned = true;
+        return false;
+      }
       
-      await issueWarning(threadID, messageID, senderID, { body: message }, "Spamming (5 identical messages in 10 seconds)");
+      if (userSpam.messages.length >= 5) {
+        const threadInfo = await getThreadInfo(threadID);
+        const userInfo = await getUserInfo(senderID);
+        const nickname = threadInfo?.nicknames?.[senderID] || userInfo?.name || "User";
 
-      spamDetection.delete(key);
-      return true;
+        console.log(`⚠️ Permanent warning for ${nickname} for spamming the same message`);
+        
+        await issueWarning(threadID, messageID, senderID, { body: message }, "Spamming (5 identical messages in 10 seconds)", true);
+
+        spamDetection.delete(key);
+        return true;
+      }
     }
   }
 
@@ -754,14 +763,26 @@ async function checkForVulgarWords(threadID, messageID, senderID, message, event
   }
   
   const keywords = data.getWarningKeywords(threadID);
-  
   const normalizedMessage = normalizeForDetection(message);
+  const originalWords = extractOriginalWords(message);
   
   for (const keyword of keywords) {
     const normalizedKeyword = normalizeForDetection(keyword);
     const flexPattern = createFlexiblePattern(normalizedKeyword);
     
     if (flexPattern.test(normalizedMessage)) {
+      let hasActualVulgarWord = originalWords.some(word => {
+        const normalizedWord = normalizeForDetection(word);
+        return normalizedWord === normalizedKeyword && !isSafeWord(word);
+      });
+      
+      let hasOnlySafeWords = originalWords.every(word => isSafeWord(word) || word.length === 0);
+      
+      if (hasOnlySafeWords || !hasActualVulgarWord) {
+        console.log(`✓ Skipping false positive: "${message}" matched "${keyword}" but only contains safe words`);
+        continue;
+      }
+      
       await issueWarning(threadID, messageID, senderID, event, `Used vulgar word: "${keyword}"`);
       return;
     }
@@ -935,6 +956,33 @@ function normalizeFancyUnicode(text) {
     if (code > 0xFFFF) i++;
   }
   return result;
+}
+
+const SAFE_WORDS = [
+  'click', 'clicks', 'clicked', 'clicking', 'clicker',
+  'clock', 'clocks',
+  'back', 'backs', 'backed', 'backing',
+  'bucket', 'buckets',
+  'duck', 'ducks',
+  'luck', 'lucky', 'luckily',
+  'suck', 'sucks', 'sucker',
+  'truck', 'trucks',
+  'stuck'
+];
+
+function isSafeWord(word) {
+  const cleanWord = word.toLowerCase().trim().replace(/[^a-z]/gi, '');
+  return SAFE_WORDS.some(safeWord => {
+    return cleanWord === safeWord || 
+           cleanWord === safeWord + 's' ||
+           cleanWord === safeWord + 'ed' ||
+           cleanWord === safeWord + 'ing' ||
+           cleanWord === safeWord + 'er';
+  });
+}
+
+function extractOriginalWords(message) {
+  return message.toLowerCase().trim().split(/\s+/).map(word => word.replace(/[^a-z]/gi, ''));
 }
 
 function normalizeForDetection(text) {
@@ -1127,7 +1175,7 @@ function createFlexiblePattern(normalizedKeyword) {
     }
   }).join('');
   
-  const finalPattern = `\\b${pattern.replace(/\[\^a-z\]\*$/, '')}\\b`;
+  const finalPattern = `(?:^|\\s)${pattern.replace(/\[\^a-z\]\*$/, '')}(?:\\s|$)`;
   return new RegExp(finalPattern, 'i');
 }
 
@@ -1993,11 +2041,25 @@ async function handleServerInfoCommand(threadID, messageID, senderID, message) {
 }
 
 async function handleInvalidCommand(threadID, messageID, senderID, message) {
+  if (isProtectedUser(senderID)) {
+    const invalidResponses = [
+      "walang ganyan bonak",
+      "Walang command na ganyan",
+      "Marunong kaba mag display ng help?",
+      "Jusko po",
+      "Walang command na ganyan inutil",
+      "eengot-engot mag command"
+    ];
+    const randomResponse = invalidResponses[Math.floor(Math.random() * invalidResponses.length)];
+    sendMessage(threadID, randomResponse, messageID);
+    return;
+  }
+
   const key = `${threadID}_${senderID}`;
   const now = Date.now();
   
   if (!spamDetection.has(key)) {
-    spamDetection.set(key, { commands: [], lastReset: now });
+    spamDetection.set(key, { commands: [], lastReset: now, warned: false });
   }
 
   const userSpam = spamDetection.get(key);
@@ -2005,18 +2067,25 @@ async function handleInvalidCommand(threadID, messageID, senderID, message) {
   if (now - userSpam.lastReset > 10000) {
     userSpam.commands = [];
     userSpam.lastReset = now;
+    userSpam.warned = false;
   }
 
   userSpam.commands.push(message);
+
+  if (userSpam.commands.length === 3 && !userSpam.warned) {
+    sendMessage(threadID, "⚠️ Warning: You're spamming invalid commands. If you continue, you will receive a permanent warning!\n\nUse .help to see available commands and avoid consequences.", messageID);
+    userSpam.warned = true;
+    return;
+  }
 
   if (userSpam.commands.length >= 5) {
     const threadInfo = await getThreadInfo(threadID);
     const userInfo = await getUserInfo(senderID);
     const nickname = threadInfo?.nicknames?.[senderID] || userInfo?.name || "User";
 
-    console.log(`⚠️ Warning ${nickname} for spamming invalid commands`);
+    console.log(`⚠️ Permanent warning for ${nickname} for spamming invalid commands`);
     
-    await issueWarning(threadID, messageID, senderID, { body: message }, "Spamming (5 invalid commands in 10 seconds)");
+    await issueWarning(threadID, messageID, senderID, { body: message }, "Spamming (5 invalid commands in 10 seconds)", true);
 
     spamDetection.delete(key);
     return;
@@ -2039,8 +2108,8 @@ async function handleUnsendMessage(event) {
   
   if (!threadID || !senderID) return;
   
-  if (isAdmin(threadID, senderID)) {
-    console.log("⏭️ Skipping unsend notification for admin");
+  if (isProtectedUser(senderID)) {
+    console.log("⏭️ Skipping unsend notification for protected user");
     return;
   }
   
@@ -2078,13 +2147,19 @@ async function handleUnsendMessage(event) {
       }
     });
     
+    console.log(`📤 Attempting to send unsent image notification to Developer (${DEVELOPER_ID})`);
+    console.log(`📸 Image count: ${imageAttachments.length}`);
+    
     api.sendMessage(dmMessage, DEVELOPER_ID, (err) => {
       if (err) {
-        console.error("Failed to send unsent image notification to developer:", err);
+        console.error("❌ Failed to send unsent image notification to developer:", err);
+        console.error("Error details:", JSON.stringify(err, null, 2));
       } else {
-        console.log(`✅ Sent unsent image notification to developer`);
+        console.log(`✅ Successfully sent unsent image notification to developer for ${nickname}`);
       }
     });
+    
+    sendMessage(threadID, `⚠️ ${nickname} unsent a picture! (Notification sent to Developer)`);
     
     return;
   }
@@ -2093,22 +2168,28 @@ async function handleUnsendMessage(event) {
   const now = Date.now();
   
   if (!unsentSpamTracking.has(unsentKey)) {
-    unsentSpamTracking.set(unsentKey, { count: 0, lastUnsent: now });
+    unsentSpamTracking.set(unsentKey, { count: 0, lastUnsent: now, warned: false });
   }
   
   const unsentData = unsentSpamTracking.get(unsentKey);
   
   if (now - unsentData.lastUnsent > 60000) {
     unsentData.count = 0;
+    unsentData.warned = false;
   }
   
   unsentData.count++;
   unsentData.lastUnsent = now;
   
+  if (unsentData.count === 3 && !unsentData.warned) {
+    sendMessage(threadID, "⚠️ Warning: You're spamming unsent messages. If you continue, you will receive a permanent warning!\n\nUse .help to see available commands and avoid consequences.");
+    unsentData.warned = true;
+  }
+  
   if (unsentData.count >= 5) {
-    console.log(`⚠️ Warning ${nickname} for spamming unsent messages`);
+    console.log(`⚠️ Permanent warning for ${nickname} for spamming unsent messages`);
     
-    await issueWarning(threadID, null, senderID, { body: "" }, "Spamming unsent messages (5 unsends in 60 seconds)");
+    await issueWarning(threadID, null, senderID, { body: "" }, "Spamming unsent messages (5 unsends in 60 seconds)", true);
     
     unsentSpamTracking.delete(unsentKey);
     return;
